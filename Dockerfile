@@ -23,8 +23,17 @@ RUN pnpm fetch
 
 # Copy source and build
 COPY . .
+
+# Optional: Clone from a remote repository if GIT_REPO_URL is provided
+ARG GIT_REPO_URL
+ARG GIT_BRANCH=main
+RUN if [ -n "$GIT_REPO_URL" ]; then \
+      rm -rf ./* && \
+      git clone -b $GIT_BRANCH $GIT_REPO_URL . ; \
+    fi
+
 # install with dev deps (needed to build)
-RUN pnpm install --offline --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Build the Remix app (SSR + client)
 RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm run build
