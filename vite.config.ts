@@ -1,10 +1,12 @@
-import { cloudflareDevProxyVitePlugin as remixCloudflareDevProxy, vitePlugin as remixVitePlugin } from '@remix-run/dev';
+import { vitePlugin as remixVitePlugin } from '@remix-run/dev';
 import UnoCSS from 'unocss/vite';
 import { defineConfig, type ViteDevServer } from 'vite';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { optimizeCssModules } from 'vite-plugin-optimize-css-modules';
 import tsconfigPaths from 'vite-tsconfig-paths';
 import * as dotenv from 'dotenv';
+import { vercelPreset } from '@vercel/remix/vite';
+import { netlifyPlugin } from '@netlify/remix-adapter/plugin';
 
 // Load environment variables from multiple files
 dotenv.config({ path: '.env.local' });
@@ -12,6 +14,23 @@ dotenv.config({ path: '.env' });
 dotenv.config();
 
 export default defineConfig((config) => {
+  const adapter = process.env.REMIX_ADAPTER;
+  const isNetlify = adapter === 'netlify';
+  const isVercel = adapter === 'vercel';
+
+  let remixConfig: any = {
+    future: {
+      v3_fetcherPersist: true,
+      v3_relativeSplatPath: true,
+      v3_throwAbortReason: true,
+      v3_lazyRouteDiscovery: true,
+    },
+  };
+
+  if (isVercel) {
+    remixConfig.presets = [vercelPreset()];
+  }
+
   return {
     define: {
       'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
@@ -19,8 +38,20 @@ export default defineConfig((config) => {
     build: {
       target: 'esnext',
     },
+    ssr: {
+        external: ['node:crypto', 'node:path', 'node:fs', 'node:stream', 'node:util', 'node:events', 'node:assert', 'node:zlib', 'node:process', 'node:buffer', 'node:url', 'crypto', 'path', 'fs', 'stream', 'util', 'events', 'assert', 'zlib', 'process', 'buffer', 'url', 'undici'],
+    },
+    resolve: {
+        alias: {
+            '@remix-run/cloudflare': '@remix-run/node',
+            ...(!config.ssrBuild ? {
+                'undici': './app/utils/empty.ts',
+                'util/types': './app/utils/empty.ts'
+            } : {}),
+        }
+    },
     plugins: [
-      nodePolyfills({
+      !config.ssrBuild && nodePolyfills({
         include: ['buffer', 'process', 'util', 'stream'],
         globals: {
           Buffer: true,
@@ -43,19 +74,12 @@ export default defineConfig((config) => {
           return null;
         },
       },
-      config.mode !== 'test' && remixCloudflareDevProxy(),
-      remixVitePlugin({
-        future: {
-          v3_fetcherPersist: true,
-          v3_relativeSplatPath: true,
-          v3_throwAbortReason: true,
-          v3_lazyRouteDiscovery: true,
-        },
-      }),
+      remixVitePlugin(remixConfig),
       UnoCSS(),
       tsconfigPaths(),
       chrome129IssuePlugin(),
       config.mode === 'production' && optimizeCssModules({ apply: 'build' }),
+      isNetlify && netlifyPlugin(),
     ],
     envPrefix: [
       'VITE_',
