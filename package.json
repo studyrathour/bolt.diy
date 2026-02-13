@@ -13,9 +13,9 @@
   "scripts": {
     "deploy": "npm run build && wrangler pages deploy",
     "build": "remix vite:build",
-    "build:node": "cross-env REMIX_ADAPTER=node remix vite:build",
-    "build:vercel": "cross-env REMIX_ADAPTER=vercel remix vite:build",
-    "build:netlify": "cross-env REMIX_ADAPTER=netlify remix vite:build",
+    "build:node": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" REMIX_ADAPTER=node remix vite:build",
+    "build:vercel": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" REMIX_ADAPTER=vercel remix vite:build",
+    "build:netlify": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" REMIX_ADAPTER=netlify remix vite:build",
     "start:node": "remix-serve build/server/index.js",
     "dev": "node pre-start.cjs  && remix vite:dev",
     "test": "vitest --run",
@@ -47,7 +47,7 @@
     "electron:build:dist": "rm -rf dist && pnpm electron:build:renderer && pnpm electron:build:deps && electron-builder --mwl"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "1.0.6",

@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build:netlify"
+  publish = "build/client"
+
+[dev]
+  command = "remix vite:dev"
+
+[build.environment]
+  NODE_VERSION = "20"
