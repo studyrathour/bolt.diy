@@ -25,10 +25,10 @@ RUN pnpm fetch
 COPY . .
 
 # Optional: Clone from a remote repository if GIT_REPO_URL is provided
-ARG GIT_REPO_URL
-ARG GIT_BRANCH=main
+ARG GIT_REPO_URL=https://github.com/studyrathour/bolt.diy.git
+ARG GIT_BRANCH=huggingface-deployment-3881506017650372633
 RUN if [ -n "$GIT_REPO_URL" ]; then \
-      rm -rf ./* && \
+      find . -mindepth 1 -delete && \
       git clone -b $GIT_BRANCH $GIT_REPO_URL . ; \
     fi
 
