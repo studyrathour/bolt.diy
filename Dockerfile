@@ -23,8 +23,17 @@ RUN pnpm fetch
 
 # Copy source and build
 COPY . .
+
+# Optional: Clone from a remote repository if GIT_REPO_URL is provided
+ARG GIT_REPO_URL=https://github.com/studyrathour/bolt.diy.git
+ARG GIT_BRANCH=huggingface-deployment-3881506017650372633
+RUN if [ -n "$GIT_REPO_URL" ]; then \
+      find . -mindepth 1 -delete && \
+      git clone -b $GIT_BRANCH $GIT_REPO_URL . ; \
+    fi
+
 # install with dev deps (needed to build)
-RUN pnpm install --offline --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 
 # Build the Remix app (SSR + client)
 RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm run build
@@ -41,7 +50,7 @@ FROM prod-deps AS bolt-ai-production
 WORKDIR /app
 
 ENV NODE_ENV=production
-ENV PORT=5173
+ENV PORT=7860
 ENV HOST=0.0.0.0
 
 # Non-sensitive build arguments
@@ -74,11 +83,11 @@ RUN mkdir -p /root/.config/.wrangler && \
 # Make bindings script executable
 RUN chmod +x /app/bindings.sh
 
-EXPOSE 5173
+EXPOSE 7860
 
 # Healthcheck for deployment platforms
 HEALTHCHECK --interval=10s --timeout=3s --start-period=5s --retries=5 \
-  CMD curl -fsS http://localhost:5173/ || exit 1
+  CMD curl -fsS http://localhost:${PORT}/ || exit 1
 
 # Start using dockerstart script with Wrangler
 CMD ["pnpm", "run", "dockerstart"]
