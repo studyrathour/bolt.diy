@@ -11,3 +11,8 @@
   NPM_CONFIG_FETCH_RETRY_FACTOR = "10"
   NPM_CONFIG_FETCH_RETRY_MINTIMEOUT = "20000"
   NPM_CONFIG_TIMEOUT = "600000"
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/remix-server"
+  status = 200

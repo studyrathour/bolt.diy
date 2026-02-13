@@ -25,6 +25,8 @@ export default defineConfig((config) => {
       v3_throwAbortReason: true,
       v3_lazyRouteDiscovery: true,
     },
+    // Explicitly set serverEntry to ensure consistent build output
+    serverEntry: './app/entry.server.tsx',
   };
 
   if (isVercel) {
