@@ -13,6 +13,10 @@
   "scripts": {
     "deploy": "npm run build && wrangler pages deploy",
     "build": "remix vite:build",
+    "build:node": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" REMIX_ADAPTER=node remix vite:build",
+    "build:vercel": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" REMIX_ADAPTER=vercel remix vite:build",
+    "build:netlify": "cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" REMIX_ADAPTER=netlify remix vite:build",
+    "start:node": "remix-serve build/server/index.js",
     "dev": "node pre-start.cjs  && remix vite:dev",
     "test": "vitest --run",
     "test:watch": "vitest",
@@ -43,7 +47,7 @@
     "electron:build:dist": "rm -rf dist && pnpm electron:build:renderer && pnpm electron:build:deps && electron-builder --mwl"
   },
   "engines": {
-    "node": ">=18.18.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@ai-sdk/amazon-bedrock": "1.0.6",
@@ -79,6 +83,7 @@
     "@lezer/highlight": "^1.2.1",
     "@modelcontextprotocol/sdk": "^1.15.0",
     "@nanostores/react": "^0.7.3",
+    "@netlify/remix-adapter": "^2.7.0",
     "@octokit/rest": "^21.0.2",
     "@octokit/types": "^13.6.2",
     "@openrouter/ai-sdk-provider": "^0.0.5",
@@ -100,10 +105,12 @@
     "@remix-run/cloudflare-pages": "^2.15.2",
     "@remix-run/node": "^2.15.2",
     "@remix-run/react": "^2.15.2",
+    "@remix-run/serve": "^2.16.8",
     "@tanstack/react-virtual": "^3.13.0",
     "@types/react-beautiful-dnd": "^13.1.8",
     "@uiw/codemirror-theme-vscode": "^4.23.6",
     "@unocss/reset": "^0.61.9",
+    "@vercel/remix": "^2.16.7",
     "@webcontainer/api": "1.6.1-internal.1",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/addon-web-links": "^0.11.0",
@@ -168,7 +175,6 @@
     "@iconify-json/ph": "^1.2.1",
     "@iconify/types": "^2.0.0",
     "@remix-run/dev": "^2.15.2",
-    "@remix-run/serve": "^2.15.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@types/diff": "^5.2.3",
